@@ -7,10 +7,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.yourname.messenger.viewmodel.ChatViewModel
+import com.yourname.messenger.ChatViewModel  // ИСПРАВЛЕНО: был .viewmodel.ChatViewModel
 import com.yourname.messenger.Message
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
