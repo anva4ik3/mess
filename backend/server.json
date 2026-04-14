@@ -1,0 +1,37 @@
+const express = require('express');
+const http = require('http');
+const { WebSocketServer } = require('ws');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+const clients = new Map();
+
+wss.on('connection', (ws, req) => {
+  const userId = req.url.split('?userId=')[1] || 'anon';
+  clients.set(ws, userId);
+  console.log(`🔗 Подключен: ${userId}`);
+
+  ws.on('message', (data) => {
+    const msg = JSON.parse(data);
+    console.log(`📨 [${userId}]: ${msg.text}`);
+    // Рассылка всем, кроме отправителя (для демо)
+    clients.forEach((_, client) => {
+      if (client !== ws && client.readyState === 1) {
+        client.send(JSON.stringify({ ...msg, sender: userId }));
+      }
+    });
+  });
+
+  ws.on('close', () => clients.delete(ws));
+});
+
+app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
